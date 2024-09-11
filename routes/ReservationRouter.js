@@ -14,6 +14,7 @@ const {
   revenueByMonth,
   uploadPaidOff,
   deletePaidOff,
+  monthlyRevenue,
 } = require('../controllers/ReservationController');
 const { authMiddleware } = require('../middleware/UserMiddleware');
 const upload = require('../middleware/uploadMiddleware');
@@ -29,6 +30,8 @@ router.get('/total-reservations', authMiddleware, totalReservations);
 
 // Read data total monthly current
 router.get('/current-month-revenue', authMiddleware, monthlyRevenueCurrent);
+
+router.get('/monthly-revenue', authMiddleware, monthlyRevenue);
 
 // Read data sales
 router.get('/sales-data', authMiddleware, getSalesData);

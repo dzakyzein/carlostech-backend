@@ -71,6 +71,27 @@ exports.monthlyRevenueCurrent = async (req, res) => {
   }
 };
 
+exports.monthlyRevenue = async (req, res) => {
+  const { month, year } = req.query;
+
+  try {
+    const [result] = await db.query(
+      `SELECT 
+         SUM(price) AS totalRevenue 
+       FROM reservations 
+       WHERE MONTH(createdAt) = ? 
+       AND YEAR(createdAt) = ?`,
+      {
+        replacements: [month, year],
+      }
+    );
+    res.json(result[0]);
+  } catch (err) {
+    console.error('Error fetching monthly revenue: ', err);
+    res.status(500).send('Error fetching monthly revenue');
+  }
+};
+
 exports.detailReservation = async (req, res) => {
   try {
     const id = req.params.id;
