@@ -1,20 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const {
-  storeTool,
   getAllTools,
   detailTool,
   updateTool,
   destroyTool,
+  createTool,
 } = require('../controllers/ToolController');
 const {
   authMiddleware,
   permissionUser,
 } = require('../middleware/UserMiddleware');
 const upload = require('../middleware/uploadMiddleware');
-
+const multer = require('multer');
+const uploadbb = multer({ storage: multer.memoryStorage() });
 //create data
-router.post('/', authMiddleware, permissionUser('admin'), storeTool);
+router.post(
+  '/',
+  authMiddleware,
+  permissionUser('admin'),
+  upload.single('image'),
+  createTool
+);
 
 //read data FindAll
 router.get('/', getAllTools);

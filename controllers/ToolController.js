@@ -1,6 +1,7 @@
 const { Tool } = require('../models');
 const asyncHandle = require('../middleware/asyncHandle');
 const upload = require('../middleware/uploadMiddleware');
+const storeImage = require('../utils/lib');
 
 exports.getAllTools = async (req, res) => {
   try {
@@ -33,6 +34,36 @@ exports.detailTool = async (req, res) => {
     return res.status(200).json({
       status: 'Success',
       data: tool,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 'Fail',
+      error: 'Server down',
+    });
+  }
+};
+
+exports.createTool = async (req, res) => {
+  try {
+    const imgFile = req.file;
+    if (!imgFile) {
+      console.error('Image not found');
+      return res.status(400).json({
+        status: 'Fail',
+        error: 'Image not found',
+      });
+    }
+    const imgString = imgFile ? await storeImage(imgFile) : '';
+
+    const newTool = await Tool.create({
+      title,
+      type,
+      description,
+      imageUrl: imgString,
+    });
+    res.status(201).json({
+      status: 'Success',
+      data: newTool,
     });
   } catch (error) {
     return res.status(500).json({
