@@ -1,10 +1,10 @@
-const { Reservation, User } = require('../models');
-const fs = require('fs');
-const path = require('path');
-const db = require('../config/db');
+const { Reservation, User } = require("../models");
+const fs = require("fs");
+const path = require("path");
+const db = require("../config/db");
 
 const cleanPrice = (price) => {
-  return parseFloat(price.replace(/Rp\s?|\.|,/g, ''));
+  return parseFloat(price.replace(/Rp\s?|\.|,/g, ""));
 };
 
 exports.getAllReservations = async (req, res) => {
@@ -13,13 +13,13 @@ exports.getAllReservations = async (req, res) => {
     const user = req.user;
 
     // Jika pengguna adalah admin, ambil semua reservasi
-    if (user.role === 'admin') {
+    if (user.role === "admin") {
       const reservations = await Reservation.findAll({
-        include: [{ model: User, as: 'user' }],
+        include: [{ model: User, as: "user" }],
       });
 
       return res.status(200).json({
-        status: 'Success',
+        status: "Success",
         data: reservations,
       });
     }
@@ -28,17 +28,17 @@ exports.getAllReservations = async (req, res) => {
     const userId = user.id;
     const reservations = await Reservation.findAll({
       where: { userId: userId },
-      include: [{ model: User, as: 'user' }],
+      include: [{ model: User, as: "user" }],
     });
 
     return res.status(200).json({
-      status: 'Success',
+      status: "Success",
       data: reservations,
     });
   } catch (error) {
     return res.status(500).json({
-      status: 'Fail',
-      error: 'Server down',
+      status: "Fail",
+      error: "Server down",
     });
   }
 };
@@ -46,12 +46,12 @@ exports.getAllReservations = async (req, res) => {
 exports.totalReservations = async (req, res) => {
   try {
     const [result] = await db.query(
-      'SELECT COUNT(*) AS totalReservations FROM reservations'
+      "SELECT COUNT(*) AS totalReservations FROM Reservations"
     );
     res.json(result[0]);
   } catch (err) {
-    console.error('Error fetching total reservations: ', err);
-    res.status(500).send('Error Fetching total reservations');
+    console.error("Error fetching total reservations: ", err);
+    res.status(500).send("Error Fetching total reservations");
   }
 };
 
@@ -60,14 +60,14 @@ exports.monthlyRevenueCurrent = async (req, res) => {
     const [result] = await db.query(
       `SELECT 
          SUM(price) AS totalRevenue 
-       FROM reservations 
+       FROM Reservations 
        WHERE MONTH(createdAt) = MONTH(CURDATE()) 
        AND YEAR(createdAt) = YEAR(CURDATE())`
     );
     res.json(result[0]);
   } catch (err) {
-    console.error('Error fetching current month revenue: ', err);
-    res.status(500).send('Error fetching current month revenue');
+    console.error("Error fetching current month revenue: ", err);
+    res.status(500).send("Error fetching current month revenue");
   }
 };
 
@@ -78,7 +78,7 @@ exports.monthlyRevenue = async (req, res) => {
     const [result] = await db.query(
       `SELECT 
          SUM(price) AS totalRevenue 
-       FROM reservations 
+       FROM Reservations 
        WHERE MONTH(createdAt) = ? 
        AND YEAR(createdAt) = ?`,
       {
@@ -87,8 +87,8 @@ exports.monthlyRevenue = async (req, res) => {
     );
     res.json(result[0]);
   } catch (err) {
-    console.error('Error fetching monthly revenue: ', err);
-    res.status(500).send('Error fetching monthly revenue');
+    console.error("Error fetching monthly revenue: ", err);
+    res.status(500).send("Error fetching monthly revenue");
   }
 };
 
@@ -96,24 +96,24 @@ exports.detailReservation = async (req, res) => {
   try {
     const id = req.params.id;
     const reservation = await Reservation.findByPk(id, {
-      include: [{ model: User, as: 'user' }],
+      include: [{ model: User, as: "user" }],
     });
 
     if (!reservation) {
       return res.status(404).json({
-        status: 'Fail',
-        error: 'Data id tidak ditemukan',
+        status: "Fail",
+        error: "Data id tidak ditemukan",
       });
     }
 
     return res.status(200).json({
-      status: 'Success',
+      status: "Success",
       data: reservation,
     });
   } catch (error) {
     return res.status(500).json({
-      status: 'Fail',
-      error: 'Server down',
+      status: "Fail",
+      error: "Server down",
     });
   }
 };
@@ -134,13 +134,13 @@ exports.storeReservation = async (req, res) => {
     });
 
     res.status(201).json({
-      status: 'Success',
+      status: "Success",
       data: newReservation,
     });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
-      status: 'Fail',
+      status: "Fail",
       error: error.errors,
     });
   }
@@ -161,24 +161,24 @@ exports.updateReservation = async (req, res) => {
     });
 
     const updatedReservation = await Reservation.findByPk(id, {
-      include: [{ model: User, as: 'user' }],
+      include: [{ model: User, as: "user" }],
     });
 
     if (!updatedReservation) {
       return res.status(404).json({
-        status: 'Fail',
-        error: 'Data id tidak ditemukan',
+        status: "Fail",
+        error: "Data id tidak ditemukan",
       });
     }
 
     return res.status(200).json({
-      status: 'Success',
+      status: "Success",
       data: updatedReservation,
     });
   } catch (error) {
     return res.status(500).json({
-      status: 'Fail',
-      error: 'Server down',
+      status: "Fail",
+      error: "Server down",
     });
   }
 };
@@ -190,8 +190,8 @@ exports.destroyReservation = async (req, res) => {
 
   if (!reservation) {
     return res.status(404).json({
-      status: 'Fail',
-      error: 'Data id tidak ditemukan',
+      status: "Fail",
+      error: "Data id tidak ditemukan",
     });
   }
 
@@ -202,7 +202,7 @@ exports.destroyReservation = async (req, res) => {
   });
 
   return res.status(200).json({
-    status: 'Success',
+    status: "Success",
     message: `Data dengan id ${id} berhasil dihapus`,
   });
 };
@@ -211,11 +211,11 @@ exports.getSalesData = async (req, res) => {
   try {
     const salesData = await Reservation.findAll({
       attributes: [
-        [db.fn('DATE', db.col('createdAt')), 'date'],
-        [db.fn('SUM', db.col('amount')), 'sales'],
+        [db.fn("DATE", db.col("createdAt")), "date"],
+        [db.fn("SUM", db.col("amount")), "sales"],
       ],
-      group: ['date'],
-      order: [['date', 'ASC']],
+      group: ["date"],
+      order: [["date", "ASC"]],
     });
 
     // Format data sesuai kebutuhan
@@ -226,8 +226,8 @@ exports.getSalesData = async (req, res) => {
 
     res.json({ salesData: formattedData });
   } catch (error) {
-    console.error('Error fetching sales data:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error fetching sales data:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -239,8 +239,8 @@ exports.uploadPaymentProof = async (req, res) => {
 
     if (!reservation) {
       return res.status(404).json({
-        status: 'Fail',
-        error: 'Data id tidak ditemukan',
+        status: "Fail",
+        error: "Data id tidak ditemukan",
       });
     }
 
@@ -249,13 +249,13 @@ exports.uploadPaymentProof = async (req, res) => {
     await reservation.save();
 
     return res.status(200).json({
-      status: 'Success',
+      status: "Success",
       data: reservation,
     });
   } catch (error) {
     return res.status(500).json({
-      status: 'Fail',
-      error: 'Server down',
+      status: "Fail",
+      error: "Server down",
     });
   }
 };
@@ -268,17 +268,17 @@ exports.deletePaymentProof = async (req, res) => {
 
     if (!reservation) {
       return res.status(404).json({
-        status: 'Fail',
-        error: 'Data id tidak ditemukan',
+        status: "Fail",
+        error: "Data id tidak ditemukan",
       });
     }
 
     // Hapus file bukti pembayaran dari server jika ada
     if (reservation.paymentProof) {
-      const filePath = path.join(__dirname, '..', reservation.paymentProof);
+      const filePath = path.join(__dirname, "..", reservation.paymentProof);
       fs.unlink(filePath, (err) => {
         if (err) {
-          console.error('Gagal menghapus file:', err);
+          console.error("Gagal menghapus file:", err);
         }
       });
     }
@@ -288,14 +288,14 @@ exports.deletePaymentProof = async (req, res) => {
     await reservation.save();
 
     return res.status(200).json({
-      status: 'Success',
-      message: 'Bukti pembayaran berhasil dihapus',
+      status: "Success",
+      message: "Bukti pembayaran berhasil dihapus",
       data: reservation,
     });
   } catch (error) {
     return res.status(500).json({
-      status: 'Fail',
-      error: 'Server down',
+      status: "Fail",
+      error: "Server down",
     });
   }
 };
@@ -308,8 +308,8 @@ exports.uploadPaidOff = async (req, res) => {
 
     if (!reservation) {
       return res.status(404).json({
-        status: 'Fail',
-        error: 'Data id tidak ditemukan',
+        status: "Fail",
+        error: "Data id tidak ditemukan",
       });
     }
 
@@ -318,13 +318,13 @@ exports.uploadPaidOff = async (req, res) => {
     await reservation.save();
 
     return res.status(200).json({
-      status: 'Success',
+      status: "Success",
       data: reservation,
     });
   } catch (error) {
     return res.status(500).json({
-      status: 'Fail',
-      error: 'Server down',
+      status: "Fail",
+      error: "Server down",
     });
   }
 };
@@ -337,17 +337,17 @@ exports.deletePaidOff = async (req, res) => {
 
     if (!reservation) {
       return res.status(404).json({
-        status: 'Fail',
-        error: 'Data id tidak ditemukan',
+        status: "Fail",
+        error: "Data id tidak ditemukan",
       });
     }
 
     // Hapus file bukti pembayaran dari server jika ada
     if (reservation.paidOff) {
-      const filePath = path.join(__dirname, '..', reservation.paidOff);
+      const filePath = path.join(__dirname, "..", reservation.paidOff);
       fs.unlink(filePath, (err) => {
         if (err) {
-          console.error('Gagal menghapus file:', err);
+          console.error("Gagal menghapus file:", err);
         }
       });
     }
@@ -357,14 +357,14 @@ exports.deletePaidOff = async (req, res) => {
     await reservation.save();
 
     return res.status(200).json({
-      status: 'Success',
-      message: 'Bukti pembayaran berhasil dihapus',
+      status: "Success",
+      message: "Bukti pembayaran berhasil dihapus",
       data: reservation,
     });
   } catch (error) {
     return res.status(500).json({
-      status: 'Fail',
-      error: 'Server down',
+      status: "Fail",
+      error: "Server down",
     });
   }
 };
